@@ -42,10 +42,13 @@ class Main:
 
         _friends = vk.friends_get()
         _friends['items'] += vk.get_out_requests()['items']
-        for _friend in _friends['items']:
-            if str(_friend) not in _settings['safe_zone']:
-                _ban_list.append(_friend)
-        _ban_list = list([str(x) for x in _ban_list])
+        if _settings.get('safe_zone'):
+            for _friend in _friends['items']:
+                if str(_friend) not in _settings['safe_zone']:
+                    _ban_list.append(_friend)
+            _ban_list = list([str(x) for x in _ban_list])
+        else:
+            _ban_list = list([str(x) for x in _friends['items']])
 
         if _settings['newsfeedBan']:
             if manual:

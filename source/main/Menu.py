@@ -16,6 +16,13 @@ class Menu(object):
             if sys.argv[1] == '--auto':
                 Menu.__infinity()
                 os._exit(0)
+            if sys.argv[1] == '--gen_settings':
+                try:
+                    Settings.settings_save(StaticData.defaultSettings)
+                    hues.success('settings.json generated!')
+                except Exception:
+                    hues.error('Something went wrong')
+                os._exit(0)
 
         templ = '''Menu:
 1 - Set safe-list of friends (txt/manually)

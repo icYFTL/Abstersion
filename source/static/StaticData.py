@@ -6,5 +6,6 @@ class StaticData:
     defaultSettings = {
         'newsfeedBan': True,
         'messagesBan': True,
-        'storiesBan': True
+        'storiesBan': True,
+        'safe_zone': []
     }

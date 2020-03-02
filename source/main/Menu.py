@@ -1,10 +1,12 @@
 import json
 import os
 import sys
+
 import hues
 
 from source.console.Methods import Methods
 from source.settings.Settings import Settings
+from source.static.StaticData import StaticData
 
 
 class Menu(object):
@@ -66,16 +68,12 @@ class Menu(object):
 
     @staticmethod
     def __set_options() -> None:
-        _defaultSettings = {
-            'newsfeedBan': True,
-            'messagesBan': True,
-            'storiesBan': True
-        } if not Settings.settings_get() else Settings.settings_get()
-
         if not os.path.exists('./settings.json'):
             with open('./settings.json', 'w', encoding='UTF-8') as f:
-                f.write(json.dumps(_defaultSettings))
+                f.write(json.dumps(StaticData.defaultSettings))
                 f.close()
+        else:
+            StaticData.defaultSettings = json.loads(open('./settings.json', 'r', encoding='UTF-8').read())
 
         _nf = input('Newsfeed Ban (y/n)\n> ').lower()
         while _nf != 'y' and _nf != 'n':
@@ -89,11 +87,11 @@ class Menu(object):
         # while _mb != 'y' and _nf != 'n':
         #     _mb = input('Messages sending to you ban (y/n)\n> ').lower()
 
-        _defaultSettings['newsfeedBan'] = True if _nf == 'y' else False
-        _defaultSettings['messagesBan'] = False  # True if _mb == 'y' else False
-        _defaultSettings['storiesBan'] = True if _sr == 'y' else False
+        StaticData.defaultSettings['newsfeedBan'] = True if _nf == 'y' else False
+        StaticData.defaultSettings['messagesBan'] = False  # True if _mb == 'y' else False
+        StaticData.defaultSettings['storiesBan'] = True if _sr == 'y' else False
 
-        Settings.settings_save(_defaultSettings)
+        Settings.settings_save(StaticData.defaultSettings)
 
         Methods.console_clear()
         hues.success('Done!')

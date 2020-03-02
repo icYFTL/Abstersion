@@ -26,7 +26,7 @@ class Main:
 
         _settings = Settings.settings_get()
         if manual:
-            if len(_settings['safe_zone']) < 1:
+            if not _settings.get('safe_zone'):
                 hues.warn('No users in safe zone.\nContinue? (y/n)')
                 _choice = input('> ').lower()
                 while _choice != 'y' and _choice != 'n':
@@ -80,8 +80,8 @@ class Main:
                 if manual:
                     hues.log(
                         f'[Stories] Progress: {StaticMethods.get_percentage(abs(__init_count - len(_temp)), __init_count)}')
-                    vk.stories_ban(_temp[:100])
-                    del (_temp[:100])
+                vk.stories_ban(_temp[:100])
+                del (_temp[:100])
 
         if manual:
             Methods.console_clear()

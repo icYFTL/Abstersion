@@ -37,14 +37,19 @@ class Main:
                     return
 
         _ban_list = []
-        if _settings['newsfeedBan']:
-            _friends = vk.friends_get()
-            for _friend in _friends['items']:
-                if _friend not in _settings['safe_zone']:
-                    _ban_list.append(_friend)
+        from copy import copy
+        from source.static.StaticMethods import StaticMethods
 
+        _friends = vk.friends_get()
+        _friends['items'] += vk.get_out_requests()['items']
+        for _friend in _friends['items']:
+            if str(_friend) not in _settings['safe_zone']:
+                _ban_list.append(_friend)
+        _ban_list = list([str(x) for x in _ban_list])
+
+        if _settings['newsfeedBan']:
             if manual:
-                hues.warn(f'{len(_ban_list)} your friends will be affected.\nContinue? (y/n)')
+                hues.warn(f'{len(_ban_list)} your friends (and out requests) will be affected.\nContinue? (y/n)')
                 _choice = input('> ').lower()
                 while _choice != 'y' and _choice != 'n':
                     _choice = input('> ').lower()
@@ -54,21 +59,29 @@ class Main:
                     return
 
             __init_count = len(_ban_list)
-            _ban_list = list([str(x) for x in _ban_list])
 
-            from source.static.StaticMethods import StaticMethods
+            _temp = copy(_ban_list)
 
-            while len(_ban_list) > 0:
+            while len(_temp) > 0:
                 if manual:
                     hues.log(
-                        f'Progress: {StaticMethods.get_percentage(abs(__init_count - len(_ban_list)), __init_count)}')
-                vk.add_newsfeed_ban(_ban_list[:100])
-                del (_ban_list[:100])
-            if manual:
-                hues.success('Friends muted')
+                        f'[Newsfeed] Progress: {StaticMethods.get_percentage(abs(__init_count - len(_temp)), __init_count)}')
+                vk.add_newsfeed_ban(_temp[:100])
+                del (_temp[:100])
 
         if _settings['messagesBan']:
             pass
+
+        if _settings['storiesBan']:
+            _temp = copy(_ban_list)
+            __init_count = len(_temp)
+
+            while len(_temp) > 0:
+                if manual:
+                    hues.log(
+                        f'[Stories] Progress: {StaticMethods.get_percentage(abs(__init_count - len(_temp)), __init_count)}')
+                    vk.stories_ban(_temp[:100])
+                    del (_temp[:100])
 
         if manual:
             Methods.console_clear()

@@ -1,6 +1,6 @@
 import json
 import os
-
+import sys
 import hues
 
 from source.console.Methods import Methods
@@ -10,6 +10,11 @@ from source.settings.Settings import Settings
 class Menu(object):
     @staticmethod
     def init():
+        if len(sys.argv) > 1:
+            if sys.argv[1] == '--auto':
+                Menu.__infinity()
+                os._exit(0)
+
         templ = '''Menu:
 1 - Set safe-list of friends (txt/manually)
 2 - Set options for news blocking
@@ -63,7 +68,8 @@ class Menu(object):
     def __set_options() -> None:
         _defaultSettings = {
             'newsfeedBan': True,
-            'messagesBan': True
+            'messagesBan': True,
+            'storiesBan': True
         } if not Settings.settings_get() else Settings.settings_get()
 
         if not os.path.exists('./settings.json'):
@@ -75,12 +81,17 @@ class Menu(object):
         while _nf != 'y' and _nf != 'n':
             _nf = input('Newsfeed Ban (y/n)\n> ').lower()
 
+        _sr = input('Stories Ban (y/n)\n> ').lower()
+        while _sr != 'y' and _sr != 'n':
+            _sr = input('Stories Ban (y/n)\n> ').lower()
+
         # _mb = input('Messages sending to you ban (y/n)\n> ').lower()
         # while _mb != 'y' and _nf != 'n':
         #     _mb = input('Messages sending to you ban (y/n)\n> ').lower()
 
         _defaultSettings['newsfeedBan'] = True if _nf == 'y' else False
         _defaultSettings['messagesBan'] = False  # True if _mb == 'y' else False
+        _defaultSettings['storiesBan'] = True if _sr == 'y' else False
 
         Settings.settings_save(_defaultSettings)
 
@@ -93,16 +104,21 @@ class Menu(object):
         if manual:
             Main.routine()
         else:
-            from time import sleep
-            hues.warn('Endless mode activated')
-            while True:
-                try:
-                    Main.routine(False)
-                    hues.log('Sleep for 600 sec.')
-                    sleep(600)
-                except KeyboardInterrupt:
-                    Methods.console_clear()
-                    break
+            Menu.__infinity()
+
+    @staticmethod
+    def __infinity():
+        from source.main.Main import Main
+        from time import sleep
+        hues.warn('Endless mode activated')
+        while True:
+            try:
+                Main.routine(False)
+                hues.log('Sleep for 600 sec.')
+                sleep(600)
+            except KeyboardInterrupt:
+                Methods.console_clear()
+                break
 
     @staticmethod
     def __banlist_clear() -> None:
@@ -115,7 +131,7 @@ class Menu(object):
         _ban_list = list([str(x) for x in _ban_list])
         __init_count = len(_ban_list)
 
-        hues.warn(f'{len(_ban_list)} your friends will be affected.\nContinue? (y/n)')
+        hues.warn(f'Banlist will be clear.\nContinue? (y/n)')
         _choice = input('> ').lower()
         while _choice != 'y' and _choice != 'n':
             _choice = input('> ').lower()
@@ -125,8 +141,20 @@ class Menu(object):
             return
 
         while len(_ban_list) > 0:
-            hues.log(f'Progress: {StaticMethods.get_percentage(abs(__init_count - len(_ban_list)), __init_count)}')
+            hues.log(
+                f'[Newsfeed] Progress: {StaticMethods.get_percentage(abs(__init_count - len(_ban_list)), __init_count)}')
             vk.unban_newsfeed(_ban_list[:100])
             del (_ban_list[:100])
+
+        _ban_list = vk.get_stories_banlist()['items']
+        _ban_list = list([str(x) for x in _ban_list])
+        __init_count = len(_ban_list)
+
+        while len(_ban_list) > 0:
+            hues.log(
+                f'[Stories] Progress: {StaticMethods.get_percentage(abs(__init_count - len(_ban_list)), __init_count)}')
+            vk.stories_unban(_ban_list[:100])
+            del (_ban_list[:100])
+
         Methods.console_clear()
         hues.success('Friends unmuted')

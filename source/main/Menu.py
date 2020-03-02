@@ -122,6 +122,7 @@ class Menu(object):
     def __banlist_clear() -> None:
         from source.vkApi.VkAPI import VkAPI
         from source.static.StaticMethods import StaticMethods
+        from time import sleep
 
         vk = VkAPI()
 
@@ -143,6 +144,7 @@ class Menu(object):
                 f'[Newsfeed] Progress: {StaticMethods.get_percentage(abs(__init_count - len(_ban_list)), __init_count)}')
             vk.unban_newsfeed(_ban_list[:100])
             del (_ban_list[:100])
+            sleep(0.4)
 
         _ban_list = vk.get_stories_banlist()['items']
         _ban_list = list([str(x) for x in _ban_list])
@@ -153,6 +155,7 @@ class Menu(object):
                 f'[Stories] Progress: {StaticMethods.get_percentage(abs(__init_count - len(_ban_list)), __init_count)}')
             vk.stories_unban(_ban_list[:100])
             del (_ban_list[:100])
+            sleep(0.4)
 
         Methods.console_clear()
         hues.success('Friends unmuted')

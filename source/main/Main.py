@@ -1,5 +1,6 @@
 import json
 import os
+from time import sleep
 
 import hues
 
@@ -71,6 +72,7 @@ class Main:
                         f'[Newsfeed] Progress: {StaticMethods.get_percentage(abs(__init_count - len(_temp)), __init_count)}')
                 vk.add_newsfeed_ban(_temp[:100])
                 del (_temp[:100])
+                sleep(0.4)
 
         if _settings['messagesBan']:
             pass
@@ -85,6 +87,7 @@ class Main:
                         f'[Stories] Progress: {StaticMethods.get_percentage(abs(__init_count - len(_temp)), __init_count)}')
                 vk.stories_ban(_temp[:100])
                 del (_temp[:100])
+                sleep(0.4)
 
         if manual:
             Methods.console_clear()

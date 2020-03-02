@@ -1,6 +1,6 @@
 class StaticData:
     author = 'icYFTL'
-    version = '1.1.3'
+    version = '1.1.4'
     name = 'Abstersion'
 
     defaultSettings = {

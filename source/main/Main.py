@@ -25,6 +25,11 @@ class Main:
                     os._exit(-1)
                 hues.success('Settings loaded.')
 
+        from source.static.StaticData import StaticData
+
+        if not Settings.settings_get():
+            Settings.settings_save(StaticData.defaultSettings)
+
         _settings = Settings.settings_get()
         if manual:
             if not _settings.get('safe_zone'):
@@ -43,6 +48,7 @@ class Main:
 
         _friends = vk.friends_get()
         _friends['items'] += vk.get_out_requests()['items']
+
         if _settings.get('safe_zone'):
             for _friend in _friends['items']:
                 if str(_friend) not in _settings['safe_zone']:
